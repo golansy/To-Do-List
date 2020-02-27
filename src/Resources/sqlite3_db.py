@@ -116,7 +116,58 @@ class SQLite3DB:
         out += "|"
         out = beginning + out
         print(out)
-
+    
+    def table_formatting(self, list_to_fmt):
+        num_rows = 1
+        fmt_out = []
+        num_vert_spaces = {}
+        vert_size = {}
+        i = 0
+        while i < num_rows:
+            fmt_row = []
+            j = 0
+            for member in list_to_fmt:
+                if (i == 0):
+                    size = 1
+                    if len(member) > self.__FIELD_SIZE:
+                        size = len(member) // self.__FIELD_SIZE
+                        if (len(member) % self.__FIELD_SIZE != 0):
+                            size += 1
+                    if (size > num_rows):
+                        num_rows = size
+                    fmt_row.append(member[:self.__FIELD_SIZE])
+                    member = member[self.__FIELD_SIZE:]
+                    list_to_fmt[j] = member
+                j += 1
+                    
+            fmt_out.append(fmt_row)
+            i += 1
+            
+        return fmt_out
+                    
+    
+    def format_string_to_table(self, str_to_fmt):
+        str_to_fmt = str_to_fmt.split(',')
+        fmt_list = self.table_formatting(str_to_fmt)
+        fmt_out = ""
+        for row in fmt_list:
+            fmt_out += '|'
+            num_spaces = self.__ID_SIZE - len(row[0])
+            fmt_out += " " * (num_spaces // 2)
+            fmt_out += row[0]
+            fmt_out += " " * (num_spaces // 2 + num_spaces % 2)
+            fmt_out += "|"
+            row = row[1:]
+            for member in row:
+                num_spaces = self.__FIELD_SIZE - len(member)
+                fmt_str = " " * (num_spaces // 2)
+                fmt_str += member
+                fmt_str += " " * (num_spaces // 2 + num_spaces % 2)
+                fmt_out += fmt_str + '|'
+            fmt_out += "\n"
+        return fmt_out[:-1]
+        
+    '''
     def format_string_to_table(self, str_to_fmt, fmt_out = "", list_to_fmt = []):
         if list_to_fmt == []:
             str_to_fmt = str_to_fmt.split(',')
@@ -146,7 +197,7 @@ class SQLite3DB:
             fmt_out += "\n"
             fmt_out = self.format_string_to_table("", fmt_out, next_line)
         return fmt_out
-
+    '''
     def check_list_empty(self, l):
         for el in l:
             if el != "":
