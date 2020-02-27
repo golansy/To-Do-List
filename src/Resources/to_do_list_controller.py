@@ -74,7 +74,7 @@ def see_table(db, table_name=None):
 def finish_task(db):
     #does not handle having a todo item in tasks with same name as one in task_history
     task_id = input(" ... ")
-    task = db.select_task(task_id, "tasks")
+    task = db.select_task(task_id, "tasks")[1:]
     try:
         db.create_task(tuple(task), "task_history")
     except Error as e:
@@ -109,3 +109,11 @@ def clear_table(db, table_name="tasks"):
     if (y_or_n == "y"):
         db.clear_table(table_name)
 
+def expand_row(db, table_name="tasks"):
+    task_id = input(" ... ")
+    try:
+        db.expand_row(task_id, table_name)
+    except Error as e:
+        print("Invalid task id")
+        expand_row(db, table_name)
+    input()

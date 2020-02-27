@@ -12,6 +12,7 @@ class SQLite3DB:
         self.__FIELD_SIZE = FIELD_SIZE
         self.__NUM_FIELDS = NUM_FIELDS
         self.__ID_SIZE = FIELD_SIZE
+        self.__MAX_ROWS = 2
         try:
             self._conn = sqlite3.connect(db_file)
         except Error as e:
@@ -23,6 +24,9 @@ class SQLite3DB:
 
     def set_id_size(self, ID_SIZE):
         self.__ID_SIZE = ID_SIZE
+    
+    def set_max_rows(self, MAX_ROWS):
+        self.__MAX_ROWS = MAX_ROWS
 
     def create_table(self, create_table_sql):
         try:
@@ -60,11 +64,22 @@ class SQLite3DB:
     def select_task(self, task_id, table_name):
         cur = self._conn.execute("SELECT * FROM " + table_name + " WHERE id=" + task_id)
         task = cur.fetchone()
-        task = task[1:]
+        #task = task[1:]
         return task
 
     def clear_table(self, table_name):
         self._conn.execute("DELETE FROM " + table_name + ";")
+        
+    def expand_row(self, task_id, table_name):
+        task = self.select_task(task_id, table_name)
+        headers = self._conn.execute("PRAGMA table_info(tasks);")
+        self.print_header(headers)
+        row_to_print = ''
+        for field in task:
+            row_to_print += str(field) + ','
+        print(self.format_string_to_table(row_to_print[:-1], True))
+        self.print_row_separator()
+        
 
     def print_table(self, table_name, rows=None):
         if rows == None:
@@ -120,8 +135,6 @@ class SQLite3DB:
     def table_formatting(self, list_to_fmt):
         num_rows = 1
         fmt_out = []
-        num_vert_spaces = {}
-        vert_size = {}
         i = 0
         while i < num_rows:
             fmt_row = []
@@ -135,9 +148,10 @@ class SQLite3DB:
                             size += 1
                     if (size > num_rows):
                         num_rows = size
-                    fmt_row.append(member[:self.__FIELD_SIZE])
-                    member = member[self.__FIELD_SIZE:]
-                    list_to_fmt[j] = member
+                fmt_row.append(member[:self.__FIELD_SIZE])
+                #fmt_row[-1] += " " * (self.__FIELD_SIZE - len(fmt_row[-1]))
+                member = member[self.__FIELD_SIZE:]
+                list_to_fmt[j] = member
                 j += 1
                     
             fmt_out.append(fmt_row)
@@ -146,9 +160,11 @@ class SQLite3DB:
         return fmt_out
                     
     
-    def format_string_to_table(self, str_to_fmt):
+    def format_string_to_table(self, str_to_fmt, is_expanded = False):
         str_to_fmt = str_to_fmt.split(',')
         fmt_list = self.table_formatting(str_to_fmt)
+        if (not is_expanded):
+            fmt_list = self.compress_table(fmt_list)
         fmt_out = ""
         for row in fmt_list:
             fmt_out += '|'
@@ -166,6 +182,20 @@ class SQLite3DB:
                 fmt_out += fmt_str + '|'
             fmt_out += "\n"
         return fmt_out[:-1]
+    
+    def compress_table(self,fmt_list):
+        if (len(fmt_list) <= self.__MAX_ROWS):
+            return fmt_list
+        else:
+            fmt_out = fmt_list[:self.__MAX_ROWS]
+            fmt_row = fmt_out[-1]
+            for i in range(len(fmt_row)):
+                if (len(fmt_row[i]) >= self.__FIELD_SIZE - 3 and ' ' not in fmt_row[i][self.__FIELD_SIZE - 3:]):
+                    fmt_out[-1][i] = fmt_out[-1][i][:self.__FIELD_SIZE - 3]
+                    fmt_out[-1][i] += "..."
+            return fmt_out
+                
+                    
         
     '''
     def format_string_to_table(self, str_to_fmt, fmt_out = "", list_to_fmt = []):

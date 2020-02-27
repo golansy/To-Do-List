@@ -51,6 +51,8 @@ def input_commands(conn, db):
         clear_table(db)
     elif in_string == "CLEARHIST" or in_string == "CH":
         clear_table(db, "task_history")
+    elif in_string == "EXPAND" or in_string == "EX":
+        expand_row(db)
     elif in_string == "HELP" or in_string == "H":
         help_page_1()
     elif in_string == "HELP ADD":
