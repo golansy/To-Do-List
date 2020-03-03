@@ -70,11 +70,14 @@ class SQLite3DB:
     
     def refresh_table(self, table_name):
         cur = self._conn.execute("SELECT id FROM " + table_name)
+        tasks = []
         for task_id_tup in cur.fetchall():
             for task_id in task_id_tup:
                 curr_task = self.select_task(task_id, table_name)
+                tasks.append(curr_task[1:])
                 self.delete_task(task_id, table_name)
-                self.create_task(curr_task[1:], table_name)
+        for task in tasks:
+            self.create_task(task, table_name)
     
 
     def clear_table(self, table_name):
