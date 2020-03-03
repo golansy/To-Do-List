@@ -6,7 +6,8 @@ Created on Feb 20, 2020
 import sqlite3
 from sqlite3 import Error
 class SQLite3DB:
-
+    
+    #TODO make queries not string concats
     def __init__(self, db_file, FIELD_SIZE, NUM_FIELDS):
         self._db_file = db_file
         self.__FIELD_SIZE = FIELD_SIZE
@@ -194,40 +195,7 @@ class SQLite3DB:
                     fmt_out[-1][i] = fmt_out[-1][i][:self.__FIELD_SIZE - 3]
                     fmt_out[-1][i] += "..."
             return fmt_out
-                
-                    
-        
-    '''
-    def format_string_to_table(self, str_to_fmt, fmt_out = "", list_to_fmt = []):
-        if list_to_fmt == []:
-            str_to_fmt = str_to_fmt.split(',')
-        else:
-            str_to_fmt = list_to_fmt
-        next_line = []
-        fmt_out += '|'
-        num_spaces = self.__ID_SIZE - len(str_to_fmt[0])
-        fmt_out += " " * (num_spaces // 2)
-        fmt_out += str_to_fmt[0]
-        next_line.append("")
-        fmt_out += " " * (num_spaces // 2 + num_spaces % 2)
-        fmt_out += "|"
-        str_to_fmt = str_to_fmt[1:]
-        for member in str_to_fmt:
-            if len(member) > self.__FIELD_SIZE:
-                next_line.append(member[self.__FIELD_SIZE:])
-                member = member[:self.__FIELD_SIZE]
-            else:
-                next_line.append("")
-            num_spaces = self.__FIELD_SIZE - len(member)
-            fmt_str = " " * (num_spaces // 2)
-            fmt_str += member
-            fmt_str += " " * (num_spaces // 2 + num_spaces % 2)
-            fmt_out += fmt_str + '|'
-        if (self.check_list_empty(next_line) == False):
-            fmt_out += "\n"
-            fmt_out = self.format_string_to_table("", fmt_out, next_line)
-        return fmt_out
-    '''
+    
     def check_list_empty(self, l):
         for el in l:
             if el != "":
