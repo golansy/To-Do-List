@@ -60,13 +60,22 @@ class SQLite3DB:
         return cur
 
     def delete_task(self, task_id, table_name):
-        self._conn.execute("DELETE FROM "+ table_name + " WHERE id=" + task_id)
+        self._conn.execute("DELETE FROM "+ table_name + " WHERE id=" + str(task_id))
 
     def select_task(self, task_id, table_name):
-        cur = self._conn.execute("SELECT * FROM " + table_name + " WHERE id=" + task_id)
+        cur = self._conn.execute("SELECT * FROM " + table_name + " WHERE id=" + str(task_id))
         task = cur.fetchone()
         #task = task[1:]
         return task
+    
+    def refresh_table(self, table_name):
+        cur = self._conn.execute("SELECT id FROM " + table_name)
+        for task_id_tup in cur.fetchall():
+            for task_id in task_id_tup:
+                curr_task = self.select_task(task_id, table_name)
+                self.delete_task(task_id, table_name)
+                self.create_task(curr_task[1:], table_name)
+    
 
     def clear_table(self, table_name):
         self._conn.execute("DELETE FROM " + table_name + ";")

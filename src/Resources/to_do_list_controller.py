@@ -117,3 +117,6 @@ def expand_row(db, table_name="tasks"):
         print("Invalid task id")
         expand_row(db, table_name)
     input()
+
+def refresh_table(db, table_name="tasks"):
+    db.refresh_table(table_name)
