@@ -12,7 +12,7 @@ from Resources.to_do_help import *
 #from sqlite3 import Error
 
 FIELD_SIZE = 15
-NUM_FIELDS = 4
+NUM_FIELDS = 5
 ID_SIZE = 5
 
 def menu(conn, db):
@@ -36,6 +36,9 @@ def input_commands(conn, db):
         return
     elif in_string == "SEEHIST" or in_string == "SEEH":
         see_table(db, "task_history")
+        return
+    elif in_string == "SEECLASS" or in_string == "SEEC":
+        see_class_tasks(db)
         return
     elif in_string == "EDIT" or in_string == "E":
         edit_table(db)
@@ -102,6 +105,7 @@ def main():
 
     sql_create_tasks_table = """ CREATE TABLE IF NOT EXISTS tasks (
                                         id integer PRIMARY KEY,
+                                        class_name text NOT NULL DEFAUlT 'Other',
                                         name text NOT NULL,
                                         priority integer,
                                         status_id integer NOT NULL,
@@ -110,12 +114,19 @@ def main():
                                     ); """
     sql_create_task_history_table = """ CREATE TABLE IF NOT EXISTS task_history (
                                         id integer PRIMARY KEY,
+                                        class_name text NOT NULL DEFAUlT 'Other',
                                         name text NOT NULL,
                                         priority integer,
                                         status_id integer NOT NULL,
                                         due_date text,
                                         UNIQUE(name)
                                     ); """
+    sql_create_user_table = """ CREATE TABLE IF NOT EXISTS users (
+                                    id integer PRIMARY KEY,
+                                    username text NOT NULL
+                                    plaintext text,
+                                    ciphertext text,
+                                    """
     
     db = SQLite3DB(database, FIELD_SIZE, NUM_FIELDS)
     conn = db.get_connection()

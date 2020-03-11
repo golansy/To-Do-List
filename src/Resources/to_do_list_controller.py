@@ -120,3 +120,11 @@ def expand_row(db, table_name="tasks"):
 
 def refresh_table(db, table_name="tasks"):
     db.refresh_table(table_name)
+
+def see_class_tasks(db, table_name="tasks"):
+    class_name = input(" ... ")
+    os.system("cls")
+    print(class_name)
+    db.print_class_tasks(class_name, table_name)
+
+    input()

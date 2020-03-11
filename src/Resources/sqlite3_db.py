@@ -43,7 +43,7 @@ class SQLite3DB:
         :param task:
         :return:
         """
-        sql = "INSERT INTO " + table_name + "(name,priority,status_id,due_date) VALUES(?,?,?,?)"
+        sql = "INSERT INTO " + table_name + "(class_name,name,priority,status_id,due_date) VALUES(?,?,?,?,?)"
         cur = self._conn.cursor()
         cur.execute(sql, task)
         return cur.lastrowid
@@ -79,7 +79,6 @@ class SQLite3DB:
         for task in tasks:
             self.create_task(task, table_name)
     
-
     def clear_table(self, table_name):
         self._conn.execute("DELETE FROM " + table_name + ";")
         
@@ -93,11 +92,15 @@ class SQLite3DB:
         print(self.format_string_to_table(row_to_print[:-1], True))
         self.print_row_separator()
         
-
+    def print_class_tasks(self, class_name, table_name="tasks"):
+        cur = self._conn.execute("SELECT * FROM " + table_name + " WHERE class_name='" + class_name + "';")
+        rows = cur.fetchall()
+        self.print_table(table_name, rows)
+        
     def print_table(self, table_name, rows=None):
         if rows == None:
             rows = self.fetch_table(table_name)
-        headers = self._conn.execute("PRAGMA table_info(tasks);")
+        headers = self._conn.execute("PRAGMA table_info(" + table_name + ");")
         self.print_header(headers)
 
         for row in rows:
